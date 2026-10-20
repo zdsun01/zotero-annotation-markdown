@@ -1,112 +1,89 @@
-# Zotero Annotation Markdown
-
-> **Local image and table clipboard build (0.15.4-clipboard.4):** paste screenshots and Excel/Word/web tables into annotation comments with Ctrl+V, then continue writing below the preview. See [setup and storage details](docs/en/user-guide.md#clipboard-screenshots-local-build). This is a modified build, not an official upstream release.
-
-<p align="center">
-  <img src="addon/icons/annotation-markdown.svg" width="64" height="64" alt="Zotero Annotation Markdown icon">
-</p>
-
-<p align="center">
-  <a href="https://github.com/qrkks/zotero-annotation-markdown/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/qrkks/zotero-annotation-markdown?display_name=tag&amp;sort=semver"></a>
-  <a href="https://github.com/qrkks/zotero-annotation-markdown/releases/latest"><img alt="Latest release downloads" src="https://img.shields.io/github/downloads/qrkks/zotero-annotation-markdown/latest/total?label=latest%20downloads"></a>
-  <a href="https://github.com/qrkks/zotero-annotation-markdown/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/qrkks/zotero-annotation-markdown/actions/workflows/ci.yml/badge.svg?branch=main"></a>
-  <a href="docs/en/user-guide.md#compatibility"><img alt="Zotero 9 and 10" src="https://img.shields.io/badge/Zotero-9%20%7C%2010-CC2936?logo=zotero&amp;logoColor=white"></a>
-  <a href="LICENSE"><img alt="License: AGPL-3.0-or-later" src="https://img.shields.io/badge/license-AGPL--3.0--or--later-blue"></a>
-</p>
+# Zotero Annotation Markdown — Images & Tables Edition
 
 English | [简体中文](README.zh-CN.md)
 
-Make Zotero annotation comments easier to read with Markdown headings, lists, color highlights, LaTeX math, and experimental SVG diagrams. Rendering preserves the original source stored by Zotero, so it stays editable.
+Paste screenshots and tables directly into Zotero annotation comments, then keep writing below the preview.
 
-> This project is actively developed and maintained. If you encounter a bug, rendering or compatibility issue, or have a feature request, feel free to [open an issue](https://github.com/qrkks/zotero-annotation-markdown/issues) and share your feedback. Providing your Zotero and plugin versions, reproduction steps, and minimal examples (Markdown, LaTeX, or SVG when applicable) can help us investigate problems more efficiently.
+This modified version is maintained by [zdsun01](https://github.com/zdsun01). It builds on **[Zotero Annotation Markdown](https://github.com/qrkks/zotero-annotation-markdown)** by **[qrkks](https://github.com/qrkks)**. The original author and contributors developed the Markdown renderer, math support, fast editor and other underlying features. This repository adds clipboard images, table conversion and an entry for continuing below previews. It is an independently maintained derivative, not an official upstream release.
 
-## Preview
+Current version: **`0.15.4-clipboard.4`**. Development targets **Zotero 10.0.6 on Windows**.
 
-![The same Zotero annotation as editable Markdown source and a rendered preview with headings, color highlights, and LaTeX math](docs/images/source-and-preview.webp)
+## Added in this version
 
-**Left:** edit the Markdown source. **Right:** read the formatted preview. Leave the editor or press **Escape** to save and return to the preview.
-
-| Floating outline | Page annotation popup |
+| Feature | What it does |
 | --- | --- |
-| <img src="docs/images/floating-outline.webp" width="420" alt="A long annotation with nested headings, colored highlights, and its floating outline"> | <img src="docs/images/popup-preview.webp" width="420" alt="An optional page annotation popup displaying formatted Markdown, color highlights, and LaTeX math"> |
-| Choose a heading to jump to its section within the annotation sidebar. | Enable **Render page annotation popups as Markdown** in Settings; this option is off by default. |
+| Paste screenshots | Press **Ctrl+V** in an annotation comment to import a screenshot as a managed Zotero image attachment and insert its Markdown reference. |
+| Continue below previews | Choose **Continue writing…** below an image or table to open a text field while keeping the preview visible. |
+| Paste tables | Convert a copied Excel, Word or webpage HTML table into editable Markdown. Rectangular tab-separated text is also supported. |
+| Read formatted tables | Save to show table borders and horizontal scrolling for wide tables. |
+| Keep drafts during imports | Wait for image imports before saving on Escape or blur; retain the draft when saving fails. |
 
-The Markdown, outline, and popup screenshots above use demonstration text in Zotero 10.0.5 with Annotation Markdown v0.11.0. Preview font size is set to 125%.
+The upstream Markdown, LaTeX, outline, color highlights and optional SVG functionality remain available. See the [user guide](docs/en/user-guide.md).
 
-![Editable Markdown and fenced SVG source on the left, and the same annotation rendered as a singular value decomposition diagram on the right](docs/images/svd-source-and-preview-7e2b47b8.webp)
+## Build and install
 
-**SVG diagrams:** illustrate mathematical ideas such as singular value decomposition directly in annotation comments. Edit the Markdown and fenced SVG source (**left**), then leave the editor or press **Escape** to see the rendered diagram (**right**). The original SVG source stays editable.
+The source in **this repository** contains the additions above. The upstream marketplace package and upstream releases do not include these changes.
 
-SVG rendering is experimental and off by default. Enable **Render SVG diagrams (Experimental)** in Settings to try the [SVD example](docs/examples/svd.md), [six fenced SVG samples](docs/examples/svg-samples.md), or [six raw SVG samples](docs/examples/svg-raw-samples.md).
-
-SVG rendering can produce a complete preview, a compatibility preview with a persistent warning, or source fallback with a reason. Compatibility warnings also appear in the larger-image viewer, and the original source stays unchanged. See the [supported SVG subset](docs/en/user-guide.md#svg-diagrams-experimental).
-
-Since v0.14.2, complete SVGs on their own lines can render without fences or blank separators. These SVD screenshots use English demonstration text in Zotero 10.0.6 with Annotation Markdown v0.15.1.
-
-<details>
-<summary>See the SVG larger-image viewer</summary>
-
-![The SVD annotation preview on the left and the larger-image viewer with zoom controls, a percentage indicator, and Fit on the right](docs/images/svg-preview-and-viewer.webp)
-
-Click the SVG image or choose **View larger** to inspect the diagram. In v0.13.1, use **− / +** or the mouse wheel to zoom the image and viewer together, **Fit** to restore a complete view, and drag to pan beyond the Reader bounds. Press **Escape** or choose **Close** to return to the annotation.
-
-</details>
-
-## Highlights
-
-### Reading previews
-
-- **Markdown and math:** render Markdown and LaTeX formulas in PDF and EPUB annotation sidebars.
-- **Highlights and links:** use `==Highlighted text==` or preset colors such as `==Highlighted text=={.red}`; bare URLs become clickable links.
-- **Image links:** preview standalone image URLs, including OpenAI image links without a file extension, while retaining their caption and original link. Pasted Google favicon links appear as small source icons beside short site names and stay outside image counts. Failed images fall back to the link.
-- **SVG diagrams (Experimental):** preview static SVGs from code blocks or standalone SVG source, with a larger-image viewer. Off by default; see the [supported SVG subset](docs/en/user-guide.md#svg-diagrams-experimental).
-- **Page annotation popups:** optionally render popup comments as Markdown. Off by default.
-
-### Editing and navigation
-
-- **Floating outline:** navigate headings with adjustable outline text size and optional hierarchical numbers. Image sections show `IMG`, `SVG`, or `IMG · SVG` with separate counts on hover; matching page and sidebar labels report annotation totals. Smart numbering skips any sibling group containing an already-numbered heading, along with its descendants.
-- **Fast source editing:** edit original Markdown with a [fast comment editor](docs/en/user-guide.md#why-the-replacement-editor-can-be-faster), with a native-editor fallback when unavailable.
-- **Todo tags:** optionally add `todo` tags from `todo:` or `t:` lines in saved comments.
-- **Tag-filter acceleration (Experimental):** accelerate clearing tag filters in very large annotation lists when the Reader passes compatibility checks. Off by default, with native fallback otherwise.
-
-### Settings and compatibility
-
-- **Preview controls:** enable sidebar and popup rendering independently, and adjust preview font size and rendering strategy.
-- **Math output:** KaTeX HTML + MathML is the default. Optional native MathML can reduce formula rendering cost; spacing and appearance may differ.
-- **Interface language:** settings follow Zotero's language, with English and Simplified Chinese translations.
-- **Safe rendering:** previews are sanitized, stored source stays unchanged, and rendering failures fall back to plain text.
-- **Zotero support:** Zotero Desktop 9.0 and 10.0.x. Current validation prioritizes Zotero 10; see [compatibility details](docs/en/user-guide.md#compatibility).
-
-## Installation
-
-Install `Zotero Annotation Markdown` from the Zotero Add-ons marketplace.
-
-For manual installation, download `zotero-annotation-markdown.xpi` from the [latest GitHub release](https://github.com/qrkks/zotero-annotation-markdown/releases/latest). In Zotero, open **Tools → Plugins**, then drag the `.xpi` file into the Plugins window.
-
-## Documentation
-
-- [User guide](docs/en/user-guide.md)
-- [Architecture and file map](docs/en/architecture.md)
-- [Development and release](docs/en/development.md)
-- [Localization and translation contributions](docs/en/localization.md)
-- [Performance diagnostics](docs/en/performance-diagnostics.md)
-- [Documentation index and translation policy](docs/README.md)
-
-## Quick development
+Use Node.js 24 and the pnpm version specified in `package.json`:
 
 ```powershell
-pnpm install
-pnpm test
-pnpm run build
+git clone https://github.com/zdsun01/zotero-annotation-markdown.git
+cd zotero-annotation-markdown
+pnpm install --frozen-lockfile
 pnpm run package
 ```
 
-The packaged add-on is generated at `dist/zotero-annotation-markdown.xpi`.
+1. The build produces `dist/zotero-annotation-markdown.xpi`.
+2. In Zotero, open **Tools → Plugins** and install that XPI, then restart Zotero.
+3. In the plugin settings, enable **Use the fast annotation comment editor** and **Render page annotation popups as Markdown**.
+
+This build uses the same add-on ID as upstream and replaces it when installed. Automatic upstream updates are disabled for `-clipboard.` builds to keep these modifications installed. Installing an official upstream XPI restores the upstream version; you can then re-enable automatic updates in the plugin manager.
+
+## Usage
+
+### Screenshots and continued writing
+
+1. Copy a screenshot, click an annotation comment and press **Ctrl+V**.
+2. Wait for the image to finish saving. Press **Escape** or click elsewhere to save and preview.
+3. Choose **Continue writing…** below the preview to add text, another image or a table.
+4. Press **Escape** or click elsewhere to save the appended content.
+
+Images are stored as ordinary Zotero attachments beside the PDF under its parent item, or at library level for a standalone PDF. Comments store stable attachment references. File sync follows your Zotero settings; another computer needs this modified plugin and the downloaded attachments. Deleting a comment's image reference does not delete the attachment. Native mobile readers and exported PDFs do not automatically embed these previews.
+
+Supported screenshot formats: PNG, JPEG, GIF and WebP, up to **8 MiB per image**.
+
+### Tables
+
+Copy one table from Excel, Word or a webpage, paste into the comment editor, then press **Escape** to preview it. If the clipboard provides both an HTML table and its screenshot, the editable table takes priority. Plain TSV needs at least two rows and two columns with consistent widths.
+
+- The first row becomes the header. Text and grid positions are retained.
+- Merged cells expand into ordinary grid cells; text stays in the top-left cell.
+- Cell line breaks display as `⏎`. Font styling, colors, embedded images and spreadsheet calculations are not retained.
+- Limits: **200 rows, 50 columns and 2,000 grid cells**. Multiple/nested tables and selections mixing prose with a table are not converted.
+
+The full editor uses Markdown source. This version is not a complete WYSIWYG editor.
+
+## Validation and feedback
+
+`pnpm run verify` passed **47 test files / 1,198 tests**, TypeScript, documentation checks, build and packaging for the feature implementation. Screenshot pasting was confirmed by the user on Zotero 10.0.6. The append and table workflows have automated coverage; native table Ctrl+V from each source application and cross-device sync still need manual validation. Zotero 9 remains in the inherited compatibility declaration but has not been verified for these additions.
+
+Report problems with this modified version in [this repository's Issues](https://github.com/zdsun01/zotero-annotation-markdown/issues), including your Zotero version, plugin version and reproduction steps. Please use a non-sensitive example table or annotation.
+
+## Documentation and attribution
+
+- [User guide](docs/en/user-guide.md)
+- [Architecture](docs/en/architecture.md) and [development guide](docs/en/development.md)
+- [Change log](CHANGELOG.md)
+- [Image verification notes](docs/test-evidence/2026-10-20-clipboard-images.md) and [table verification notes](docs/test-evidence/2026-10-20-clipboard-tables.md)
+- **Original author:** [qrkks](https://github.com/qrkks)
+- **Upstream project:** [qrkks/zotero-annotation-markdown](https://github.com/qrkks/zotero-annotation-markdown)
+- **Upstream starting revision:** [`d203ea5`](https://github.com/qrkks/zotero-annotation-markdown/commit/d203ea5)
+- **Modified version maintainer:** [zdsun01](https://github.com/zdsun01)
+
+Thanks to the upstream author and contributors for the foundation. Existing demonstration images and upstream documentation retained in this repository originate from that project.
 
 ## License
 
-Copyright (c) 2026 qrkks. Licensed under the [GNU Affero General Public License, version 3 or any later version](LICENSE) (`AGPL-3.0-or-later`). See [NOTICE](NOTICE) for the project license notice.
+The current project retains **[AGPL-3.0-or-later](LICENSE)** and the original **Copyright (c) 2026 qrkks** notice. See [NOTICE](NOTICE) for the original notice and this version's modification attribution.
 
-Published releases up to and including v0.15.4 were distributed under MIT. Those existing grants remain valid; the [original MIT notice](licenses/MIT-legacy.txt) is retained for that code. This does not offer the current revision under MIT as an alternative to AGPL.
-
-Third-party components retain their own licenses. Each newly packaged XPI includes the project license, third-party notices, and the project and dependency source snapshot used for that build; see `SOURCE.txt` inside the XPI. Contributions to the current project are accepted under `AGPL-3.0-or-later` unless explicitly stated otherwise.
+Upstream releases through v0.15.4 were distributed under MIT; their [historical MIT notice](licenses/MIT-legacy.txt) is preserved. It is not an alternative license for this current revision. Third-party components retain their own licenses. Packaged XPIs include license notices and the matching project and dependency source snapshot, described in `SOURCE.txt` inside the XPI.

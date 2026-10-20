@@ -1,112 +1,89 @@
-# Zotero Annotation Markdown
-
-> **本地图片与表格粘贴版（0.15.4-clipboard.4）：**支持 Ctrl+V 粘贴截图、Excel/Word/网页表格，并在预览下方继续输入文字。请参阅[使用说明](docs/zh-CN/user-guide.md)。这是本地修改版，并非上游官方发布。
-
-<p align="center">
-  <img src="addon/icons/annotation-markdown.svg" width="64" height="64" alt="Zotero Annotation Markdown 图标">
-</p>
-
-<p align="center">
-  <a href="https://github.com/qrkks/zotero-annotation-markdown/releases/latest"><img alt="最新版本" src="https://img.shields.io/github/v/release/qrkks/zotero-annotation-markdown?display_name=tag&amp;sort=semver"></a>
-  <a href="https://github.com/qrkks/zotero-annotation-markdown/releases/latest"><img alt="最新版下载量" src="https://img.shields.io/github/downloads/qrkks/zotero-annotation-markdown/latest/total?label=latest%20downloads"></a>
-  <a href="https://github.com/qrkks/zotero-annotation-markdown/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/qrkks/zotero-annotation-markdown/actions/workflows/ci.yml/badge.svg?branch=main"></a>
-  <a href="docs/zh-CN/user-guide.md#兼容性"><img alt="Zotero 9 和 10" src="https://img.shields.io/badge/Zotero-9%20%7C%2010-CC2936?logo=zotero&amp;logoColor=white"></a>
-  <a href="LICENSE"><img alt="许可证：AGPL-3.0-or-later" src="https://img.shields.io/badge/license-AGPL--3.0--or--later-blue"></a>
-</p>
+# Zotero Annotation Markdown — 图片与表格增强版
 
 [English](README.md) | 简体中文
 
-用 Markdown 标题、列表、彩色高亮、LaTeX 公式和实验性 SVG 示意图，让 Zotero 标注评论更清晰易读。渲染时保留 Zotero 保存的标注原文，源码仍可继续编辑。
+在 Zotero 批注评论中直接粘贴截图、表格，并在预览下方继续写文字。
 
-> 本项目正在持续开发和维护中。如果你遇到 Bug、渲染或兼容性问题，或者有功能建议，欢迎[提交 Issue](https://github.com/qrkks/zotero-annotation-markdown/issues) 与我们交流。提供 Zotero 和插件版本、复现步骤以及最小示例（如 Markdown、LaTeX 或 SVG）将有助于我们更高效地定位问题。
+本修改版由 [zdsun01](https://github.com/zdsun01) 维护，基于 **[qrkks](https://github.com/qrkks)** 开发的 **[Zotero Annotation Markdown](https://github.com/qrkks/zotero-annotation-markdown)**。Markdown 渲染、数学公式、快速编辑器等基础能力来自原作者及上游贡献者；本仓库新增剪贴板图片、表格转换和预览下方续写功能。这是独立维护的衍生版本，并非原作者的官方发布。
 
-## 功能预览
+当前版本：**`0.15.4-clipboard.4`**。开发目标环境：**Windows / Zotero 10.0.6**。
 
-![同一条 Zotero 标注的 Markdown 源码与渲染预览，展示标题、彩色高亮和 LaTeX 公式](docs/images/source-and-preview.webp)
+## 本版新增功能
 
-**左侧**：编辑 Markdown 源码。**右侧**：阅读排版后的预览。离开编辑器或按 **Esc** 即可保存并返回预览。
-
-| 浮动大纲 | 页内标注弹窗 |
+| 功能 | 效果 |
 | --- | --- |
-| <img src="docs/images/floating-outline.webp" width="420" alt="包含多级标题和彩色高亮的长标注，以及对应的浮动大纲"> | <img src="docs/images/popup-preview.webp" width="420" alt="页内标注弹窗中的 Markdown 排版、彩色高亮和 LaTeX 公式预览"> |
-| 点击大纲条目，直接跳转到标注侧栏内的对应章节。 | 在设置中开启 **Render page annotation popups as Markdown** 即可使用；该选项默认关闭。 |
+| 截图直接粘贴 | 在批注评论中按 **Ctrl+V**，将截图保存为 Zotero 图片附件，并插入 Markdown 图片引用。 |
+| 图片、表格下方续写 | 点击预览底部的 **继续输入文字…**，保留上方预览，在下方输入框继续写说明。 |
+| 复制粘贴表格 | 将 Excel、Word、网页提供的 HTML 表格转换为可编辑的 Markdown 表格，也支持规则的制表符分列文本。 |
+| 表格排版预览 | 保存后显示表格边框，较宽的表格可以横向滚动。 |
+| 粘贴与保存衔接 | 导入截图时等待保存完成，处理按 Esc、失焦等时序；保存失败时保留草稿。 |
 
-上面的 Markdown、大纲和弹窗截图使用演示文本，取自 Zotero 10.0.5 与 Annotation Markdown v0.11.0，预览字号设为 125%。
+保留上游的 Markdown、LaTeX 公式、浮动大纲、彩色高亮及可选 SVG 功能。详细说明见[使用指南](docs/zh-CN/user-guide.md)。
 
-![左侧为可编辑的 Markdown 和 SVG 围栏源码，右侧为同一条标注渲染后的奇异值分解示意图](docs/images/svd-source-and-preview-7e2b47b8.webp)
+## 构建与安装
 
-**SVG 示意图**：在批注中展示奇异值分解（SVD）等数学图示。编辑 Markdown 与 SVG 围栏源码（**左侧**），离开编辑器或按 **Esc** 后查看渲染结果（**右侧**）。原始 SVG 源码仍可继续编辑。
+上述增强功能包含在**本仓库源码**中。原项目的插件市场版本和官方 Release 不包含这些修改。
 
-SVG 渲染是默认关闭的实验性功能。在设置中开启 **渲染 SVG 图示（实验性）**，即可尝试 [SVD 示例](docs/examples/svd.md)、[六个围栏 SVG 样例](docs/examples/svg-samples.md)或[六个裸 SVG 样例](docs/examples/svg-raw-samples.md)。
-
-SVG 渲染分为完整预览、带持续提示的兼容预览，以及带原因的源码回退。兼容提示在大图查看器中也会显示，原始源码保持不变。详见[支持的 SVG 子集](docs/zh-CN/user-guide.md#svg-示意图实验性)。
-
-从 v0.14.2 起，完整 SVG 独立占一行或多行即可，不必添加围栏或空行。这些 SVD 截图使用英文演示文字，取自 Zotero 10.0.6 与 Annotation Markdown v0.15.1。
-
-<details>
-<summary>查看 SVG 大图查看器</summary>
-
-![左侧为 SVD 标注预览，右侧为带缩放按钮、比例显示和 Fit 按钮的大图查看器](docs/images/svg-preview-and-viewer.webp)
-
-点击 SVG 图片或 **View larger** 查看图形细节。v0.13.1 支持用 **− / +** 或滚轮同时缩放图片和浮层，点击 **Fit** 恢复完整视图；图片超出 Reader 可用空间后可拖动平移。按 **Esc** 或点击 **Close** 返回标注。
-
-</details>
-
-## 主要功能
-
-### 阅读预览
-
-- **Markdown 与公式**：在 PDF 和 EPUB 标注侧栏中渲染 Markdown 与 LaTeX 数学公式。
-- **高亮与链接**：使用 `==高亮文字==` 或 `==高亮文字=={.red}` 等预设颜色；裸 URL 自动转为可点击链接。
-- **图片链接**：独立成段的图片链接会显示预览，包括没有文件扩展名的 OpenAI 图片链接；保留标题和原始链接，加载失败时回退到链接。复制来的 Google 网站图标链接会以小图标与简短站点名同行显示，不计入图片数量。
-- **SVG 示意图（实验性）**：预览代码块或独立 SVG 源码中的静态图形，并提供大图查看器。默认关闭；详见[支持的 SVG 子集](docs/zh-CN/user-guide.md#svg-示意图实验性)。
-- **页内标注弹窗**：可选择将弹窗评论渲染为 Markdown，默认关闭。
-
-### 编辑与导航
-
-- **浮动大纲**：按标题跳转，可调整大纲字号并添加层级序号。含图片的章节显示 `IMG`、`SVG` 或 `IMG · SVG`，悬停可分别查看数量；文内和侧栏的对应标签显示整条标注的总数。智能编号会跳过含已有序号的兄弟组及其全部子孙。
-- **快速源码编辑**：使用[快速评论编辑器](docs/zh-CN/user-guide.md#为什么替代编辑器可以更快)编辑原始 Markdown，无法使用时回退 Zotero 原生编辑器。
-- **待办标签**：可按已保存评论中的 `todo:` 或 `t:` 行自动添加 `todo` 标签。
-- **标签筛选加速（实验性）**：Reader 通过兼容性检查时，加速超大标注列表取消标签筛选后的恢复。默认关闭，不兼容时回退原生列表。
-
-### 设置与兼容
-
-- **预览控制**：侧栏与弹窗渲染可独立开关，并可调整预览字号和渲染策略。
-- **公式输出**：默认使用 KaTeX HTML + MathML；可选择原生 MathML 降低公式渲染开销，但间距和外观可能有所不同。
-- **界面语言**：设置页跟随 Zotero 的语言，目前支持英文和简体中文。
-- **安全渲染**：预览经过清理，保存的源码保持不变，渲染失败时回退为纯文本。
-- **Zotero 兼容**：支持 Zotero Desktop 9.0 和 10.0.x，目前优先在 Zotero 10 上验证；详见[兼容性说明](docs/zh-CN/user-guide.md#兼容性)。
-
-## 安装
-
-推荐在 Zotero 插件市场中搜索 `Zotero Annotation Markdown` 并安装。
-
-也可以从[最新 GitHub Release](https://github.com/qrkks/zotero-annotation-markdown/releases/latest)下载 `zotero-annotation-markdown.xpi`。在 Zotero 中打开 **工具 → 插件**，然后把 `.xpi` 文件拖入插件窗口。
-
-## 文档
-
-- [使用指南](docs/zh-CN/user-guide.md)
-- [架构与文件职责](docs/zh-CN/architecture.md)
-- [开发与发布](docs/zh-CN/development.md)
-- [本地化与翻译贡献](docs/zh-CN/localization.md)
-- [性能诊断](docs/zh-CN/performance-diagnostics.md)
-- [文档索引与翻译规则](docs/README.md)
-
-## 快速开发
+使用 Node.js 24，以及 `package.json` 指定版本的 pnpm：
 
 ```powershell
-pnpm install
-pnpm test
-pnpm run build
+git clone https://github.com/zdsun01/zotero-annotation-markdown.git
+cd zotero-annotation-markdown
+pnpm install --frozen-lockfile
 pnpm run package
 ```
 
-打包后的插件位于 `dist/zotero-annotation-markdown.xpi`。
+1. 构建后得到 `dist/zotero-annotation-markdown.xpi`。
+2. 在 Zotero 中打开 **工具 → 插件**，安装该 XPI，然后重启 Zotero。
+3. 在插件设置中开启 **使用快速批注评论编辑器** 和 **将页面批注弹窗渲染为 Markdown**。
+
+本版沿用原插件 ID，安装时会替换原版。`-clipboard.` 版本关闭上游自动更新，避免增强功能被覆盖。重新安装原作者的 XPI 可恢复原版，此后可在插件管理器中重新开启自动更新。
+
+## 使用方法
+
+### 粘贴截图与继续输入
+
+1. 复制截图，点击批注评论，在编辑框内按 **Ctrl+V**。
+2. 等待图片保存完成，按 **Esc** 或点击其他位置，查看图片预览。
+3. 点击预览下方的 **继续输入文字…**，继续写说明，也可以再粘贴截图或表格。
+4. 按 **Esc** 或点击其他位置，保存新增内容。
+
+图片保存为 Zotero 的普通附件：与 PDF 位于同一文献条目下；独立 PDF 的图片保存到文献库顶层。批注中使用附件的稳定引用。同步沿用 Zotero 文件同步设置，其他电脑需要安装此修改版并下载对应附件。删除批注中的图片引用不会自动删除图片附件。手机原生阅读器和导出的 PDF 不会自动嵌入这些预览图片。
+
+支持 PNG、JPEG、GIF、WebP，**每张不超过 8 MiB**。
+
+### 粘贴表格
+
+从 Excel、Word 或网页复制一个表格，在批注编辑框按 **Ctrl+V**，再按 **Esc** 查看表格。如果剪贴板同时包含 HTML 表格与截图，会优先使用可编辑的表格。纯文本表格至少需要两行、两列，以制表符分列，且每行列数一致。
+
+- 第一行作为表头，保留文字和行列位置。
+- 合并单元格展开为普通网格，文字保留在左上格，其余占位格留空。
+- 单元格内换行显示为 `⏎`；不保留字体、颜色、内嵌图片和电子表格计算功能。
+- 限制为 **200 行、50 列、2,000 个网格单元**；多个表格、嵌套表格或混合正文选区不执行表格转换。
+
+完整编辑界面仍使用 Markdown 源码，本版不是完整的所见即所得编辑器。
+
+## 验证情况与问题反馈
+
+功能实现已通过 `pnpm run verify`：**47 个测试文件、1,198 项测试**，以及类型检查、文档检查、构建和打包。截图粘贴已由用户在 Zotero 10.0.6 中确认可用；预览下方续写与表格粘贴有自动化测试，各来源应用到 Zotero 的真实表格 Ctrl+V 和跨设备同步仍待人工验证。清单沿用上游的 Zotero 9 兼容声明，但本版新增功能尚未在 Zotero 9 中验证。
+
+本修改版的问题请提交到[本仓库 Issues](https://github.com/zdsun01/zotero-annotation-markdown/issues)，附上 Zotero 版本、插件版本和复现步骤。示例表格或批注请使用不含隐私的内容。
+
+## 文档与原作者引用
+
+- [使用指南](docs/zh-CN/user-guide.md)
+- [架构说明](docs/zh-CN/architecture.md)与[开发指南](docs/zh-CN/development.md)
+- [更新日志](CHANGELOG.md)
+- [图片验证记录](docs/test-evidence/2026-10-20-clipboard-images.md)与[表格验证记录](docs/test-evidence/2026-10-20-clipboard-tables.md)
+- **原作者：**[qrkks](https://github.com/qrkks)
+- **原项目：**[qrkks/zotero-annotation-markdown](https://github.com/qrkks/zotero-annotation-markdown)
+- **修改起点：**上游提交 [`d203ea5`](https://github.com/qrkks/zotero-annotation-markdown/commit/d203ea5)
+- **本修改版维护者：**[zdsun01](https://github.com/zdsun01)
+
+感谢原作者和上游贡献者提供的基础实现。本仓库保留的原有演示图片和上游文档也来自原项目。
 
 ## 许可证
 
-Copyright (c) 2026 qrkks。本项目采用 [GNU Affero 通用公共许可证第 3 版或任何后续版本](LICENSE)（`AGPL-3.0-or-later`）。项目授权声明见 [NOTICE](NOTICE)。
+本项目继续采用 **[AGPL-3.0-or-later](LICENSE)**，保留原作者的 **Copyright (c) 2026 qrkks** 声明。[NOTICE](NOTICE) 中保留原项目声明并注明本修改版的来源与新增功能。
 
-已发布的 v0.15.4 及更早版本采用 MIT 许可证，已授予的权限继续有效；这些代码的[原始 MIT 声明](licenses/MIT-legacy.txt)予以保留。这不代表当前修订版提供 MIT 作为 AGPL 之外的可选许可证。
-
-第三方组件保留各自的许可证。此后打包的每个 XPI 均包含项目许可证、第三方许可声明，以及用于本次构建的项目与依赖源码快照，详见 XPI 内的 `SOURCE.txt`。除非另有明确说明，对当前项目的贡献按 `AGPL-3.0-or-later` 接受。
+原项目已发布的 v0.15.4 及更早版本采用 MIT，相应的[历史 MIT 声明](licenses/MIT-legacy.txt)予以保留；这不代表当前修订版可选择 MIT 授权。第三方组件保留各自的许可证。打包的 XPI 包含许可声明及对应的项目、依赖源码快照，详见包内 `SOURCE.txt`。

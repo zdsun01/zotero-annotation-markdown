@@ -27,3 +27,16 @@ Third-party components retain their respective licenses. Packaged builds
 include THIRD-PARTY-NOTICES.txt and a source snapshot described in SOURCE.txt.
 
 Project: https://github.com/qrkks/zotero-annotation-markdown
+
+Modified version
+----------------
+Repository: https://github.com/zdsun01/zotero-annotation-markdown
+Maintainer: zdsun01
+Modification date: 2026-10-20
+Based on upstream revision d203ea5.
+
+This independently maintained version adds clipboard screenshot imports,
+continued writing below image/table previews, and clipboard table conversion.
+The original author and contributors retain attribution for the upstream
+project. This modified version retains AGPL-3.0-or-later and is not an
+official release by the upstream author.
