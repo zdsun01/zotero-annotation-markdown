@@ -223,7 +223,7 @@
     overflow: hidden;
 }
 
-.annotation-markdown-editing .annotation-markdown-rendered {
+.annotation-markdown-editing .annotation-markdown-rendered:not([data-annotation-markdown-append-preview="true"]) {
     display: none !important;
 }
 
@@ -621,4 +621,57 @@
     font-size: 0.9em;
     overflow-wrap: anywhere;
     white-space: inherit;
+}
+.annotation-markdown-attachment-image {
+  display: block;
+  margin: 0.5em 0;
+}
+.annotation-markdown-image-fallback {
+  display: block;
+  font-size: 0.85em;
+}
+.annotation-markdown-paste-status {
+  font-size: 12px;
+  padding: 4px;
+  overflow-wrap: anywhere;
+}
+.annotation-markdown-paste-status:empty { display: none; }
+.annotation-markdown-append-comment {
+    display: block;
+    width: 100%;
+    margin-top: 8px;
+    padding: 8px;
+    border: 1px dashed GrayText;
+    border-radius: 4px;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: start;
+    cursor: text;
+}
+.annotation-markdown-append-comment[hidden] { display: none; }
+.annotation-markdown-rendered table {
+    border-collapse: collapse;
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    margin-block: 0.5em;
+}
+.annotation-markdown-rendered th,
+.annotation-markdown-rendered td {
+    border: 1px solid GrayText;
+    padding: 0.35em 0.6em;
+    min-width: 3em;
+}
+[data-annotation-markdown-popup-enabled="true"] .annotation-popup .annotation-markdown-append-editor .annotation-markdown-fast-editor-input {
+    height: auto;
+    min-height: 3em;
+    max-height: min(20vh, 10em);
+}
+.annotation-markdown-pasted-images img {
+  display: block;
+  max-width: 100%;
+  max-height: 180px;
+  object-fit: contain;
+  margin: 4px 0;
 }

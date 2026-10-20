@@ -90,7 +90,7 @@ export function createLinkedImageLoader({ load, IntersectionObserver: Observer }
         observed.delete(target);
       }
       for (const image of container.querySelectorAll<HTMLImageElement>(`img[${SOURCE}]:not([${STATE}])`)) {
-        const figure = image.closest("figure.annotation-markdown-linked-image, a.annotation-markdown-favicon-link");
+        const figure = image.closest("figure.annotation-markdown-linked-image, .annotation-markdown-attachment-image, a.annotation-markdown-favicon-link");
         if (!figure || observed.has(figure)) continue;
         if (observer) { observed.add(figure); observer.observe(figure); }
         else start(figure);

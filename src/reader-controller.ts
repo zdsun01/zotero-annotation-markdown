@@ -1770,6 +1770,11 @@ export function createReaderController({
       }
 
       if (event.type === "focusin") {
+        // Tabbing onto the append button must leave it available for Enter/
+        // Space activation instead of opening the full source editor.
+        if ((event.target as Element | null)?.closest?.(".annotation-markdown-append-comment")) {
+          return;
+        }
         const comment = adapter.getCommentNodeForTarget?.(event.target);
         if (comment && adapter.isPopupComment?.(comment)) {
           const annotationID = adapter.getAnnotationIDForTarget?.(event.target);

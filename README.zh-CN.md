@@ -1,5 +1,7 @@
 # Zotero Annotation Markdown
 
+> **本地图片与表格粘贴版（0.15.4-clipboard.4）：**支持 Ctrl+V 粘贴截图、Excel/Word/网页表格，并在预览下方继续输入文字。请参阅[使用说明](docs/zh-CN/user-guide.md)。这是本地修改版，并非上游官方发布。
+
 <p align="center">
   <img src="addon/icons/annotation-markdown.svg" width="64" height="64" alt="Zotero Annotation Markdown 图标">
 </p>

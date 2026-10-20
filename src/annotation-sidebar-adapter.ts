@@ -6,6 +6,8 @@
  */
 import { isSvgPreviewControl } from "./svg-preview-viewer.js";
 import { handleLinkedImageError } from "./linked-image-preview.js";
+import { installImagePaste } from "./image-paste.js";
+import { installTablePaste } from "./table-paste.js";
 import { countRenderedImages, imageBadgeLabel, imageCountHint, imageLocale, type ImageCounts } from "./image-counts.js";
 
 const COMMENT_SELECTORS: string[] = [
@@ -40,6 +42,7 @@ const SOURCE_HIDDEN_ATTRIBUTE = "data-annotation-markdown-source-hidden";
 const EDITING_CLASS = "annotation-markdown-editing";
 const FAST_EDITING_CLASS = "annotation-markdown-fast-editing";
 const FAST_EDITOR_ATTRIBUTE = "data-annotation-markdown-fast-editor";
+const APPEND_COMMENT_CLASS = "annotation-markdown-append-comment";
 const FAST_EDITOR_CLOSING_ATTRIBUTE = "data-annotation-markdown-fast-editor-closing";
 const FAST_EDITOR_COMMITTED_ATTRIBUTE = "data-annotation-markdown-fast-editor-committed";
 const POPUP_KEYBOARD_SCOPE_ATTRIBUTE = "data-annotation-markdown-popup-keyboard-scope";
@@ -62,6 +65,7 @@ interface CreateAnnotationSidebarAdapterOptions {
   openLink?(url: string): void;
   isFastEditorEnabled?(): boolean;
   commitComment?(annotationID: string, comment: string): boolean;
+  importImage?(file: Blob, annotationID: string): Promise<string>;
   beginFastEditorKeyboardGuard?(): (() => void) | void;
   useWeaveroLinkColors?(): boolean;
   getLocale?(): string | undefined;
@@ -69,6 +73,7 @@ interface CreateAnnotationSidebarAdapterOptions {
 
 /** Operations the controller may perform without knowing Zotero's DOM shape. */
 export interface AnnotationSidebarAdapter {
+  importImage?: (file: Blob, annotationID: string) => Promise<string>;
   findCommentNodes(root?: Node | null): HTMLElement[];
   findRenderedCommentNodes(root?: Node | null): HTMLElement[];
   countNativeNoteEditorComments(root?: Node | null): number;
@@ -124,6 +129,7 @@ export function createAnnotationSidebarAdapter({
   openLink,
   isFastEditorEnabled = () => false,
   commitComment,
+  importImage,
   beginFastEditorKeyboardGuard,
   useWeaveroLinkColors = () => false,
   getLocale
@@ -133,6 +139,7 @@ export function createAnnotationSidebarAdapter({
   const imageCounts = new WeakMap<HTMLElement, ImageCounts>();
 
   return {
+    importImage,
     findCommentNodes(root: Node | null = documentRef) {
       const queryRoot = getQueryRoot(root);
       if (!queryRoot) {
@@ -266,6 +273,17 @@ export function createAnnotationSidebarAdapter({
         WEAVERO_LINK_COLORS_CLASS,
         safelyUseWeaveroLinkColors(useWeaveroLinkColors)
       );
+      if (
+        isFastEditorEnabled() && canUseFastEditor(node, commitComment) &&
+        preview.querySelector(".annotation-markdown-attachment-image, table") &&
+        !preview.querySelector(`.${APPEND_COMMENT_CLASS}`)
+      ) {
+        const button = node.ownerDocument.createElement("button");
+        button.type = "button";
+        button.className = APPEND_COMMENT_CLASS;
+        button.textContent = "继续输入文字… / Continue writing…";
+        preview.append(button);
+      }
       this.syncImageBadge(node);
       hideSourceNode(node);
       showPreviewNode(preview);
@@ -373,6 +391,7 @@ export function createAnnotationSidebarAdapter({
       )) {
         const session = fastEditorSessionByDocument.get(editor.ownerDocument);
         if (session?.editor === editor) {
+          if (session.imagePastePending?.()) session.close();
           session.removalObserver?.disconnect();
           clearFastEditorScrollbarInteraction(session);
           fastEditorSessionByDocument.delete(editor.ownerDocument);
@@ -475,7 +494,10 @@ export function createAnnotationSidebarAdapter({
         return false;
       }
 
-      showFastEditor(comment, this, beginFastEditorKeyboardGuard);
+      showFastEditor(
+        comment, this, beginFastEditorKeyboardGuard,
+        Boolean(targetElement?.closest(`.${APPEND_COMMENT_CLASS}`))
+      );
       return true;
     },
 
@@ -750,7 +772,8 @@ export function createAnnotationSidebarAdapter({
 function showFastEditor(
   node: HTMLElement,
   adapter: AnnotationSidebarAdapter,
-  beginFastEditorKeyboardGuard?: () => (() => void) | void
+  beginFastEditorKeyboardGuard?: () => (() => void) | void,
+  appendOnly = false
 ): void {
   const existingEditor = node.querySelector(`[${FAST_EDITOR_ATTRIBUTE}='true']`);
   if (isHTMLElement(existingEditor)) {
@@ -768,6 +791,7 @@ function showFastEditor(
   const documentRef = node.ownerDocument;
   const editor = documentRef.createElement("div");
   editor.className = "annotation-markdown-fast-editor";
+  editor.classList.toggle("annotation-markdown-append-editor", appendOnly);
   editor.setAttribute(FAST_EDITOR_ATTRIBUTE, "true");
 
   const textarea = documentRef.createElement("textarea");
@@ -778,11 +802,14 @@ function showFastEditor(
   textarea.setAttribute("contenteditable", "true");
   // Zotero also moves focus away from empty `.content` nodes on arrow keys.
   textarea.innerText = "\u200b";
-  textarea.value = originalSource;
+  textarea.value = appendOnly ? "" : originalSource;
+  if (appendOnly) {
+    textarea.placeholder = "在此继续输入文字… / Continue writing here…";
+  }
   textarea.setAttribute("aria-label", "Edit annotation comment as Markdown");
   textarea.title = "Blur or press Escape to save";
   textarea.spellcheck = true;
-  textarea.rows = originalSource.trim() ? 3 : 1;
+  textarea.rows = !appendOnly && originalSource.trim() ? 3 : 1;
   if (node.closest(ANNOTATION_POPUP_SELECTOR)) {
     // Zotero's window-capture KeyboardManager checks for `.annotation .content`
     // before deciding whether Escape should leave a comment editor or deselect
@@ -805,17 +832,40 @@ function showFastEditor(
   let contextMenuFocusTransfer = false;
   let contextMenuSelectionStart = 0;
   let contextMenuSelectionEnd = 0;
-  const commitAndClose = (reason?: "escape") => closeFastEditor(
-    node,
-    editor,
-    adapter,
-    annotationID,
-    originalSource,
-    reason
-  );
+  let deferredClose = false;
+  let deferredReason: "escape" | undefined;
+  let imagePaste: ReturnType<typeof installImagePaste> | undefined;
+  const commitAndClose = (reason?: "escape"): boolean => {
+    if (imagePaste?.isPending()) {
+      deferredClose = true;
+      deferredReason = reason;
+      return false;
+    }
+    return closeFastEditor(
+      node,
+      editor,
+      adapter,
+      annotationID,
+      originalSource,
+      reason,
+      appendOnly
+    );
+  };
+  installTablePaste(textarea, editor);
+  if (adapter.importImage) {
+    imagePaste = installImagePaste({
+      textarea, editor,
+      importImage: file => adapter.importImage!(file, annotationID),
+      settled(success) {
+        if ((deferredClose && success) || !editor.isConnected) commitAndClose(deferredReason);
+        deferredClose = false;
+      }
+    });
+  }
   const session: FastEditorSession = {
     editor,
-    close: commitAndClose
+    close: commitAndClose,
+    imagePastePending: () => imagePaste?.isPending() ?? false
   };
   const MutationObserverRef = documentRef.defaultView?.MutationObserver;
   if (MutationObserverRef && documentRef.body) {
@@ -908,8 +958,16 @@ function showFastEditor(
   const preview = getPreviewNode(node);
   hideSourceNode(node);
   preservePopupEditorHeight(node, preview);
-  hidePreviewNode(preview);
-  getSourceContainer(node, sourceNode).after(editor);
+  if (appendOnly && preview) {
+    // Keep the saved image visible above the new text. The original Markdown
+    // stays immutable for this session and is joined only when saving.
+    preview.after(editor);
+    preview.setAttribute("data-annotation-markdown-append-preview", "true");
+    preview.querySelector<HTMLElement>(`.${APPEND_COMMENT_CLASS}`)?.setAttribute("hidden", "");
+  } else {
+    hidePreviewNode(preview);
+    getSourceContainer(node, sourceNode).after(editor);
+  }
   node.classList.add(EDITING_CLASS, FAST_EDITING_CLASS);
   adapter.suppressRendering(node, 60_000);
 
@@ -917,6 +975,10 @@ function showFastEditor(
     resizeFastEditor(textarea);
     textarea.focus({ preventScroll: true });
     textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+    if (appendOnly) {
+      ensureFastEditorVisibleAfterPaste(textarea);
+      return;
+    }
     restoreFastEditorViewportAnchor(viewportAnchor);
     if (viewportAnchor) {
       // Gecko can apply focus/scroll anchoring one frame after the textarea's
@@ -932,7 +994,8 @@ function closeFastEditor(
   adapter: AnnotationSidebarAdapter,
   annotationID: string,
   originalSource: string,
-  reason?: "escape"
+  reason?: "escape",
+  appendOnly = false
 ): boolean {
   if (editor.getAttribute(FAST_EDITOR_CLOSING_ATTRIBUTE) === "true") {
     return false;
@@ -940,7 +1003,10 @@ function closeFastEditor(
   editor.setAttribute(FAST_EDITOR_CLOSING_ATTRIBUTE, "true");
 
   const textarea = editor.querySelector("textarea");
-  const source = textarea?.value ?? "";
+  const draft = textarea?.value ?? "";
+  const source = appendOnly
+    ? (draft ? originalSource + (originalSource.endsWith("\n\n") ? "" : originalSource.endsWith("\n") ? "\n" : "\n\n") + draft : originalSource)
+    : draft;
   const committed = source !== originalSource;
 
   textarea?.blur();
@@ -963,6 +1029,8 @@ function closeFastEditor(
   } else {
     hidePreviewNode(getPreviewNode(node));
   }
+  getPreviewNode(node)?.querySelector(`.${APPEND_COMMENT_CLASS}`)?.removeAttribute("hidden");
+  getPreviewNode(node)?.removeAttribute("data-annotation-markdown-append-preview");
 
   node.classList.remove(EDITING_CLASS, FAST_EDITING_CLASS);
   node.removeAttribute(SUPPRESS_UNTIL_ATTRIBUTE);
@@ -1009,6 +1077,7 @@ const fastEditorCleanupByEditor = new WeakMap<HTMLElement, () => void>();
 interface FastEditorSession {
   editor: HTMLElement;
   close(): boolean;
+  imagePastePending?(): boolean;
   removalObserver?: MutationObserver;
   preserveScrollbarInteraction?: boolean;
   preserveScrollbarTimer?: number;
@@ -1209,6 +1278,10 @@ function isPointerInNativeScrollbar(
 }
 
 function getPreviewMathScrollbar(event: Event): HTMLElement | null {
+  return getPreviewHorizontalScrollbar(event, ".katex-display");
+}
+
+function getPreviewHorizontalScrollbar(event: Event, selector: string): HTMLElement | null {
   const target = getElementTarget(event.target);
   if (!target || isInsideNativeNoteEditor(target) || target.closest("a[href], button, input, textarea, select, [contenteditable='true']")) {
     return null;
@@ -1219,10 +1292,10 @@ function getPreviewMathScrollbar(event: Event): HTMLElement | null {
   }
   // Normally the native scrollbar targets its own scroller; Gecko can also
   // retarget it to the containing preview. Do not scan the whole Reader.
-  const closest = target.closest(".katex-display");
+  const closest = target.closest(selector);
   const candidates = closest && isHTMLElement(closest)
     ? [closest]
-    : queryHtmlElements(preview, ".katex-display");
+    : queryHtmlElements(preview, selector);
   for (const scroller of candidates) {
     // A glyph near the bottom of a short formula is still content. Only the
     // scroller itself (or a retargeted ancestor) can represent its native bar.
@@ -1285,7 +1358,7 @@ function getPreviewScrollbar(event: Event): HTMLElement | null {
     }
   }
 
-  return getPreviewMathScrollbar(event);
+  return getPreviewMathScrollbar(event) ?? getPreviewHorizontalScrollbar(event, "table");
 }
 
 function restoreFastEditorViewportAnchor(
@@ -1407,6 +1480,13 @@ function createPreviewNode(
   preview.setAttribute(PREVIEW_ATTRIBUTE, "true");
   preview.addEventListener("error", handleLinkedImageError, true);
   preview.addEventListener("pointerdown", (event) => {
+    if (getElementTarget(event.target)?.closest(`.${APPEND_COMMENT_CLASS}`)) {
+      if (event.button === 0 && adapter.tryShowFastEditorForTarget(event.target)) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+      }
+      return;
+    }
     if (isSvgPreviewControl(event.target)) {
       if (event.button === 0) event.stopPropagation();
       return;
@@ -1427,6 +1507,13 @@ function createPreviewNode(
     }
   }, { capture: true });
   preview.addEventListener("mousedown", (event) => {
+    if (getElementTarget(event.target)?.closest(`.${APPEND_COMMENT_CLASS}`)) {
+      if (event.button === 0 && adapter.tryShowFastEditorForTarget(event.target)) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+      }
+      return;
+    }
     if (isSvgPreviewControl(event.target)) {
       if (event.button === 0) event.stopPropagation();
       return;
@@ -1453,6 +1540,12 @@ function createPreviewNode(
     }
   }, { capture: true });
   preview.addEventListener("click", (event) => {
+    if (getElementTarget(event.target)?.closest(`.${APPEND_COMMENT_CLASS}`)) {
+      event.preventDefault();
+      event.stopPropagation();
+      adapter.tryShowFastEditorForTarget(event.target);
+      return;
+    }
     const link = getElementTarget(event.target)?.closest("a[href]");
     if (!link) {
       return;

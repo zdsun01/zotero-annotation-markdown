@@ -15,6 +15,7 @@ import { createSvgRenderer } from "./svg-renderer.js";
 import { createRawSvgBlockProtector } from "./raw-svg-blocks.js";
 import { installLinkedImagePreviews } from "./linked-image-preview.js";
 import { installSourceFavicons } from "./source-favicon.js";
+import { installAttachmentImagePreviews } from "./clipboard-image.js";
 import type { MarkdownRenderer } from "./types.js";
 import type { MathOutput } from "./settings.js";
 
@@ -143,6 +144,7 @@ function createDefaultMarkdownEngine(isSvgEnabled: () => boolean, renderSvg: Ret
   markdown.use(markdownItMarkColors);
   installLinkedImagePreviews(markdown, deferLinkedImages);
   installSourceFavicons(markdown, deferLinkedImages);
+  installAttachmentImagePreviews(markdown);
   markdown.linkify.add("zotero:", "http:");
   const originalFence = markdown.renderer.rules.fence!;
   markdown.renderer.rules.fence = (tokens, index, options, env, self) => {

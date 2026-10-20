@@ -15,6 +15,20 @@
 
 ### Image links
 
+#### Clipboard screenshots (local build)
+
+Local build `0.15.4-clipboard.4` also accepts copied tables. Copy one table from Excel, Word or a webpage and press **Ctrl+V** in the fast comment editor to insert editable Markdown; Escape saves and displays a bordered table. A clipboard HTML table takes priority over its image representation. Plain tab-separated text is converted when it has at least two rows and two columns with consistent widths. **Continue writing…** below the preview opens a field for more text, screenshots or tables.
+
+The first row becomes the header. Text and grid positions are retained; merged cells expand into a grid with text in the top-left cell and empty placeholders elsewhere. Cell line breaks display as `⏎`. Fonts, colors, images and spreadsheet calculations are not retained; copied formula results become text. Limits are 200 rows, 50 columns and 2,000 grid cells. Multiple/nested tables, selections mixing prose with a table, and oversized input retain native paste behavior instead of partial conversion.
+
+Enable **Use the fast annotation comment editor** and **Render page annotation popups as Markdown** in the plugin settings. Click a comment, take/copy a screenshot, then press **Ctrl+V** (Cmd+V on macOS). A thumbnail appears below the source editor. Press Escape or click elsewhere to save and see the image in the comment preview. Ordinary text paste keeps its existing behavior. PNG, JPEG, GIF and WebP images up to 8 MiB each are supported; SVG clipboard files are not.
+
+The image is imported as a normal Zotero attachment beside the PDF under its parent item (or at library level for a standalone PDF). The comment stores a short Markdown image link using the attachment's stable item key, not a temporary path or base64 text. Files follow your Zotero file-sync settings and quota. Other computers need this modified plugin and the downloaded attachment for inline previews. Missing files leave a clickable Zotero item link; download the attachment and reopen the reader to retry. Native mobile readers and exported PDFs do not embed these images automatically.
+
+Choose **Continue writing…** at the bottom of an attachment-image preview to open a text field below the visible image. Type more text or paste another screenshot, then press Escape or click elsewhere to append the draft to the existing comment. Leaving the field empty preserves the original comment. Clicking ordinary preview text still opens the full Markdown source editor.
+
+Full editing still uses Markdown source, with a thumbnail for newly pasted images; this is not a WYSIWYG document editor. Deleting an image link does not delete the attachment, so undo and other references remain safe. You can remove unused screenshot attachments manually in Zotero. The local XPI uses the upstream add-on ID and replaces it, rather than running both copies. Automatic upstream updates are disabled through the add-on manager for this build; the required update URL remains in the manifest. Installing the official XPI again restores upstream behavior and leaves image attachments intact. Re-enable automatic updates in the plugin manager if you return to upstream.
+
 A paragraph consisting only of a Markdown link, reference-style link, or bare URL previews the image when its HTTP(S) path ends in `.png`, `.jpg`, `.jpeg`, `.gif`, `.webp`, `.avif`, or `.bmp`. HTTPS links under `images.openai.com/static-rsc/` and versioned paths such as `/static-rsc-4/` are also recognized without a file extension. Sentence links, headings, tight list items, code examples, and other web links keep their normal layout.
 
 Images load lazily and fit the annotation preview width. The original link and its formatted caption remain below the image; choosing the image or caption opens the original URL through the existing link handler. If the image cannot load, only its caption link remains. This applies to sidebar and page-popup Markdown previews without changing the stored Markdown. Explicit `![description](https://example.org/photo.jpg)` images keep their existing behavior.

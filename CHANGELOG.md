@@ -1,5 +1,36 @@
 # Changelog
 
+## 0.15.4-clipboard.4 - 2026-10-20 (local build)
+
+- Paste HTML tables or rectangular TSV as editable Markdown in sidebar, popup and append editors. Preserve text, expand merged cells, protect cell punctuation, and prefer table data over accompanying clipboard images.
+- Add table borders, horizontal scrolling and a Continue writing entry below table previews. Keep unsupported clipboard selections on the native paste path.
+- 支持复制 Excel、Word、网页表格或制表符分列文本并粘贴为 Markdown 表格，保留文字、展开合并格；表格优先于剪贴板附带截图。
+- 表格预览添加边框、横向滚动和下方继续输入入口，不支持的选区保留原有粘贴行为。
+
+## 0.15.4-clipboard.3 - 2026-10-20 (local build)
+
+- Add a Continue writing entry below attachment-image previews. Keep the image visible while typing in a separate field below it, then append the draft on Escape or blur. Support more pasted images and preserve the draft if saving fails.
+- 新增图片预览下方的「继续输入文字」入口，保留上方图片，在下方输入并保存文字，也可继续粘贴截图；保存失败保留草稿。
+
+## 0.15.4-clipboard.2 - 2026-10-20 (local build)
+
+- Fix installation rejection: Zotero requires `applications.zotero.update_url`. Restore that field and use `AddonManager.AUTOUPDATE_DISABLE` for this local build instead. Validate Zotero's required manifest fields before building.
+- 修复安装失败：恢复 Zotero 强制要求的 `applications.zotero.update_url`，改用插件管理器的自动更新开关保护本地修改；打包前校验必填清单字段。
+
+## 0.15.4-clipboard.1 - 2026-10-20 (local build)
+
+### Added
+
+- Paste raster screenshots into sidebar and popup fast editors. Import into managed Zotero attachments, insert stable Markdown references, and preview locally through the host.
+- Keep imports alive across Escape, blur and popup removal; retain text on failure and expose a retryable error. Add clipboard, storage and rendering regression coverage.
+- Mark this build as locally modified and disable upstream automatic updates.
+
+### 新增
+
+- 在侧栏和弹窗快速编辑器中粘贴截图，保存为 Zotero 图片附件并自动插入固定 Markdown 引用，支持本地预览。
+- 处理粘贴后立即按 Esc、失焦和弹窗关闭的保存时序；失败时保留文字并提示重试，增加粘贴、存储和渲染回归测试。
+- 标识本地修改版并关闭上游自动更新。
+
 ## Unreleased
 
 ### Changed

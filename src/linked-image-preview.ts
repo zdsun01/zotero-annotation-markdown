@@ -66,5 +66,5 @@ export function hideFailedLinkedImage(image: Element): void {
   }
   if (!image.matches?.("img.annotation-markdown-linked-image-content")) return;
   const link = image.closest<HTMLAnchorElement>("a.annotation-markdown-linked-image-target");
-  if (link?.closest("figure.annotation-markdown-linked-image")) link.hidden = true;
+  if (link?.closest("figure.annotation-markdown-linked-image, .annotation-markdown-attachment-image")) link.hidden = true;
 }

@@ -10,6 +10,7 @@ var ANNOTATION_MARKDOWN_LIFECYCLE_REASONS = [
 ];
 
 function startup(data, reason) {
+  disableLocalBuildUpdates(data);
   // Startup can be repeated in a new bootstrap scope without a prior shutdown.
   // Keep ownership on the shared host so old Reader controllers cannot survive.
   const previousRuntime = Zotero.AnnotationMarkdownRuntime;
@@ -53,6 +54,20 @@ function shutdown() {
 function install() {}
 
 function uninstall() {}
+
+// Zotero requires update_url even for local builds. Keep the valid manifest and
+// disable automatic replacement through the add-on manager's supported setting.
+function disableLocalBuildUpdates(data) {
+  if (!String(data.version ?? "").includes("-clipboard.") || typeof ChromeUtils === "undefined") return;
+  try {
+    const { AddonManager } = ChromeUtils.importESModule("resource://gre/modules/AddonManager.sys.mjs");
+    AddonManager.getAddonByID(data.id).then(addon => {
+      if (addon && addon.version === data.version) addon.applyBackgroundUpdates = AddonManager.AUTOUPDATE_DISABLE;
+    }).catch(error => Zotero?.logError?.(error));
+  } catch (error) {
+    Zotero?.logError?.(error);
+  }
+}
 
 function registerPreferencePane(data) {
   if (!Zotero?.PreferencePanes?.register) {

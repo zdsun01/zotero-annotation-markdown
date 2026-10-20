@@ -13,6 +13,20 @@ afterEach(() => {
 });
 
 describe("bootstrap", () => {
+  test("disables automatic updates only for the installed local build", async () => {
+    const bootstrap = await loadBootstrapScript();
+    const addon = { version: "0.15.4-clipboard.2", applyBackgroundUpdates: 1 };
+    const getAddonByID = vi.fn().mockResolvedValue(addon);
+    bootstrap.ChromeUtils = { importESModule: () => ({ AddonManager: { getAddonByID, AUTOUPDATE_DISABLE: 0 } }) };
+    bootstrap.disableLocalBuildUpdates({ id: "test@local", version: addon.version });
+    await Promise.resolve();
+    expect(getAddonByID).toHaveBeenCalledWith("test@local");
+    expect(addon.applyBackgroundUpdates).toBe(0);
+    addon.applyBackgroundUpdates = 1;
+    bootstrap.disableLocalBuildUpdates({ id: "test@local", version: "0.15.4" });
+    await Promise.resolve();
+    expect(addon.applyBackgroundUpdates).toBe(1);
+  });
   test.each([[false, true], [true, true], [false, false], [true, false]])(
     "keeps one working outline after duplicate startup (expanded %s, first startup settled %s)", async (initialExpanded, firstStartupSettled) => {
     document.body.innerHTML = `<div id="annotations" style="overflow-y:auto">

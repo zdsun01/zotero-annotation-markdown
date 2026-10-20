@@ -4,8 +4,10 @@ import path from "node:path";
 import { build } from "esbuild";
 import { inlineKatexWoff2Fonts } from "./katex-assets.mjs";
 import { packageLicensing } from "./package-licensing.mjs";
+import { validateAddonManifest } from "./validate-addon-manifest.mjs";
 
 const root = process.cwd();
+validateAddonManifest(JSON.parse(await readFile(path.join(root, "addon", "manifest.json"), "utf8")));
 const distAddon = path.join(root, "dist", "addon");
 
 await rm(path.join(root, "dist"), { force: true, recursive: true });

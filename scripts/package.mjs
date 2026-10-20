@@ -35,8 +35,10 @@ const manifest = JSON.parse(await readFile(path.join(root, "addon", "manifest.js
 const xpiHash = createHash("sha256").update(xpiBytes).digest("hex");
 const updateManifest = `${JSON.stringify(createUpdateManifest({ packageJson, manifest, xpiHash }), null, 2)}\n`;
 
-await writeFile(path.join(root, "updates.json"), updateManifest);
-await writeFile(path.join(root, "dist", "updates.json"), updateManifest);
+if (manifest.applications.zotero.update_url && !manifest.version.includes("-clipboard.")) {
+  await writeFile(path.join(root, "updates.json"), updateManifest);
+  await writeFile(path.join(root, "dist", "updates.json"), updateManifest);
+}
 
 async function listFiles(directory) {
   const entries = (await readdir(directory)).sort();

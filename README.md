@@ -1,5 +1,7 @@
 # Zotero Annotation Markdown
 
+> **Local image and table clipboard build (0.15.4-clipboard.4):** paste screenshots and Excel/Word/web tables into annotation comments with Ctrl+V, then continue writing below the preview. See [setup and storage details](docs/en/user-guide.md#clipboard-screenshots-local-build). This is a modified build, not an official upstream release.
+
 <p align="center">
   <img src="addon/icons/annotation-markdown.svg" width="64" height="64" alt="Zotero Annotation Markdown icon">
 </p>

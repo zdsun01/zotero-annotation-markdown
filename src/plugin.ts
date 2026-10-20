@@ -7,6 +7,8 @@
 import { createAnnotationSidebarAdapter } from "./annotation-sidebar-adapter.js";
 import { createMarkdownRenderer } from "./markdown-renderer.js";
 import { createLinkedImageFetcher, type ImageHttpApi } from "./linked-image-loader.js";
+import { createZoteroImageStore, type ZoteroImageApi } from "./zotero-image-store.js";
+import { parseImageAttachmentURL } from "./clipboard-image.js";
 import { createReaderController } from "./reader-controller.js";
 import { createReaderRegistry } from "./reader-registry.js";
 import { registerAutoTodoTagger, type ZoteroTagApi } from "./auto-todo-tag.js";
@@ -39,6 +41,7 @@ const READER_EVENTS = ["renderSidebarAnnotationHeader", "renderToolbar"] as cons
 const WEAVERO_RECOLOR_AM_LINKS_PREF_KEY = "weavero.recolorAmLinks";
 
 interface ReaderLike {
+  itemID?: number;
   document?: Document | null;
   window?: Window | null;
   _iframeWindow?: Window | null;
@@ -92,6 +95,11 @@ interface ZoteroPrefsApi {
 }
 
 interface ZoteroApi extends ZoteroTagApi {
+  Attachments?: ZoteroImageApi["Attachments"];
+  File?: ZoteroImageApi["File"];
+  Libraries?: ZoteroImageApi["Libraries"];
+  Groups?: ZoteroImageApi["Groups"];
+  getTempDirectory?: ZoteroImageApi["getTempDirectory"];
   version?: string;
   locale?: string;
   HTTP?: ImageHttpApi;
@@ -181,6 +189,12 @@ export function createPlugin({
             return createNoopReaderController();
           }
           const readerWindow = getReaderWindow(reader) ?? readerDocument.defaultView ?? windowRef;
+          const imageStore = Zotero?.Attachments?.importFromFile && Zotero.File && Zotero.Items &&
+            Zotero.Libraries && Zotero.Groups && Zotero.getTempDirectory && reader.itemID && readerWindow
+            ? createZoteroImageStore(Zotero as unknown as ZoteroImageApi, reader.itemID, binary => readerWindow.btoa(binary))
+            : undefined;
+          const fetchImage = Zotero?.HTTP && readerWindow
+            ? createLinkedImageFetcher(Zotero.HTTP, binary => readerWindow.btoa(binary)) : undefined;
           return createReaderController({
             reader,
             adapter: createAnnotationSidebarAdapter({
@@ -191,6 +205,7 @@ export function createPlugin({
               ),
               commitComment: (annotationID, comment) =>
                 commitReaderAnnotationComment(reader, annotationID, comment),
+              importImage: imageStore?.importImage,
               beginFastEditorKeyboardGuard: () =>
                 beginReaderFastEditorKeyboardGuard(reader),
               useWeaveroLinkColors: () => useWeaveroLinkColors(Zotero),
@@ -209,9 +224,11 @@ export function createPlugin({
             MutationObserver: readerWindow?.MutationObserver,
             hostVersion: Zotero?.version,
             getLocale: () => Zotero?.locale,
-            loadLinkedImage: Zotero?.HTTP && readerWindow
-              ? createLinkedImageFetcher(Zotero.HTTP, binary => readerWindow.btoa(binary))
-              : undefined,
+            loadLinkedImage: imageStore || fetchImage ? async url => {
+              if (parseImageAttachmentURL(url) && imageStore) return imageStore.loadImage(url);
+              if (fetchImage) return fetchImage(url);
+              throw new Error("Image loading unavailable");
+            } : undefined,
             readerReady: true,
             styleText,
             logger: diagnosticsLogger
