@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.15.4-clipboard.5 - 2026-10-21 (modified build)
+
+- Restore Delete for a selected rendered annotation when keyboard focus remains in the hidden native comment editor. Use Zotero's native deletion command and undo, scoped to the matching single selected annotation. Keep text editing, IME, menus, read-only/external annotations and ordinary native deletion unchanged.
+- 修复批注已显示预览、焦点却仍在隐藏原生评论框时 Delete 无效的问题；调用 Zotero 原生删除命令删除对应整条批注，保留撤销，保护文字编辑、输入法、菜单及只读批注。
+
 ## 0.15.4-clipboard.4 - 2026-10-20 (local build)
 
 - Paste HTML tables or rectangular TSV as editable Markdown in sidebar, popup and append editors. Preserve text, expand merged cells, protect cell punctuation, and prefer table data over accompanying clipboard images.

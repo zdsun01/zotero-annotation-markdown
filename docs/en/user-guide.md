@@ -17,6 +17,8 @@
 
 #### Clipboard screenshots (local build)
 
+Build `0.15.4-clipboard.5` repairs Delete when a rendered preview leaves focus in the hidden original comment editor. Close the context menu, select the annotation, and press **Delete** to use Zotero's native deletion command with undo. This removes the entire annotation, including its highlight or note, not just its comment. Visible editors, IME composition, read-only annotations and open menus/dialogs do not use this fallback. Screenshot attachments are retained.
+
 Local build `0.15.4-clipboard.4` also accepts copied tables. Copy one table from Excel, Word or a webpage and press **Ctrl+V** in the fast comment editor to insert editable Markdown; Escape saves and displays a bordered table. A clipboard HTML table takes priority over its image representation. Plain tab-separated text is converted when it has at least two rows and two columns with consistent widths. **Continue writing…** below the preview opens a field for more text, screenshots or tables.
 
 The first row becomes the header. Text and grid positions are retained; merged cells expand into a grid with text in the top-left cell and empty placeholders elsewhere. Cell line breaks display as `⏎`. Fonts, colors, images and spreadsheet calculations are not retained; copied formula results become text. Limits are 200 rows, 50 columns and 2,000 grid cells. Multiple/nested tables, selections mixing prose with a table, and oversized input retain native paste behavior instead of partial conversion.

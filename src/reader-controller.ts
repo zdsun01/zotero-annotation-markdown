@@ -18,6 +18,7 @@ import { createNativeAnnotationRowLazyController } from "./native-annotation-row
 import { createSvgPreviewViewer, isSvgPreviewControl, isSvgViewerTarget } from "./svg-preview-viewer.js";
 import { createSvgAnnotationBadges } from "./svg-annotation-badges.js";
 import { createLinkedImageLoader } from "./linked-image-loader.js";
+import { installPreviewDeleteShortcut } from "./preview-delete-shortcut.js";
 import { countRenderedImages, type ImageCounts } from "./image-counts.js";
 
 interface ReaderViewLike {
@@ -130,6 +131,7 @@ interface CreateReaderControllerOptions {
   getLocale?(): string | undefined;
   loadLinkedImage?(url: string): PromiseLike<string>;
   readerReady?: boolean;
+  deletePreviewAnnotation?(id: string): boolean;
 }
 
 const MAX_RENDER_CACHE_BYTES: number = 32 * 1024 * 1024;
@@ -170,6 +172,7 @@ export function createReaderController({
   settings,
   getLocale,
   loadLinkedImage,
+  deletePreviewAnnotation,
   MutationObserver: MutationObserverRef = globalThis.MutationObserver,
   IntersectionObserver: IntersectionObserverRef,
   styleText = "",
@@ -191,6 +194,7 @@ export function createReaderController({
   let safetyTimer: number | undefined;
   let renderingPausedGlobally = false;
   let pasteHandler: EventListener | undefined;
+  let stopPreviewDeleteShortcut: (() => void) | undefined;
   let annotationScrollbarHandler: EventListener | undefined;
   let selectedAnnotationScroller: HTMLElement | null = null;
   let previewScrollbarInteraction = false;
@@ -464,6 +468,7 @@ export function createReaderController({
       registerPasteHandler();
       registerAnnotationScrollbarHandlers();
       registerFastEditorHandlers();
+      registerPreviewDeleteShortcut();
       registerEditingPauseHandlers();
       this.renderNow();
       nativeRowLazyController.refresh();
@@ -475,6 +480,8 @@ export function createReaderController({
 
     stop() {
       shutdownCleanupFailures = [];
+      runShutdownStep(() => stopPreviewDeleteShortcut?.());
+      stopPreviewDeleteShortcut = undefined;
       runShutdownStep(() => svgViewer.stop());
       runShutdownStep(() => linkedImages?.stop());
       runShutdownStep(() => svgBadges.stop());
@@ -682,6 +689,7 @@ export function createReaderController({
     registerPasteHandler();
     registerAnnotationScrollbarHandlers();
     registerFastEditorHandlers();
+    registerPreviewDeleteShortcut();
     registerEditingPauseHandlers();
     preparePopupPositioning(root);
     renderNow();
@@ -1690,6 +1698,15 @@ export function createReaderController({
     for (const type of ANNOTATION_SCROLLBAR_EVENTS) {
       windowRef.addEventListener(type, annotationScrollbarHandler, true);
     }
+  }
+
+  function registerPreviewDeleteShortcut(): void {
+    if (stopPreviewDeleteShortcut || !deletePreviewAnnotation) return;
+    stopPreviewDeleteShortcut = installPreviewDeleteShortcut({
+      document: documentRef, adapter,
+      isEnabled: isCommentRenderingEnabled,
+      deleteAnnotation: deletePreviewAnnotation
+    });
   }
 
   function registerFastEditorHandlers(): void {

@@ -6,7 +6,7 @@
 
 本修改版由 [zdsun01](https://github.com/zdsun01) 维护，基于 **[qrkks](https://github.com/qrkks)** 开发的 **[Zotero Annotation Markdown](https://github.com/qrkks/zotero-annotation-markdown)**。Markdown 渲染、数学公式、快速编辑器等基础能力来自原作者及上游贡献者；本仓库新增剪贴板图片、表格转换和预览下方续写功能。这是独立维护的衍生版本，并非原作者的官方发布。
 
-当前版本：**`0.15.4-clipboard.4`**。开发目标环境：**Windows / Zotero 10.0.6**。
+当前版本：**`0.15.4-clipboard.5`**。开发目标环境：**Windows / Zotero 10.0.6**。
 
 ## 本版新增功能
 
@@ -17,6 +17,7 @@
 | 复制粘贴表格 | 将 Excel、Word、网页提供的 HTML 表格转换为可编辑的 Markdown 表格，也支持规则的制表符分列文本。 |
 | 表格排版预览 | 保存后显示表格边框，较宽的表格可以横向滚动。 |
 | 粘贴与保存衔接 | 导入截图时等待保存完成，处理按 Esc、失焦等时序；保存失败时保留草稿。 |
+| 按 Delete 删除整条批注 | 修复预览显示后焦点残留在隐藏评论框中导致快捷键失效的情况；编辑文字时仍按正常方式删除文字。 |
 
 保留上游的 Markdown、LaTeX 公式、浮动大纲、彩色高亮及可选 SVG 功能。详细说明见[使用指南](docs/zh-CN/user-guide.md)。
 
@@ -63,9 +64,13 @@ pnpm run package
 
 完整编辑界面仍使用 Markdown 源码，本版不是完整的所见即所得编辑器。
 
+### 删除整条批注
+
+关闭右键菜单，选中批注并处于预览状态时，按 **Delete**，效果与菜单中的「删除」一致：删除整条批注，包括对应的高亮或便笺，而不只是清空评论或删除单张图片。正在可见输入框中编辑文字时，Delete 仍只删除文字。删除走 Zotero 原有命令，可通过 Zotero 撤销；截图附件仍保留在文献库中。
+
 ## 验证情况与问题反馈
 
-功能实现已通过 `pnpm run verify`：**47 个测试文件、1,198 项测试**，以及类型检查、文档检查、构建和打包。截图粘贴已由用户在 Zotero 10.0.6 中确认可用；预览下方续写与表格粘贴有自动化测试，各来源应用到 Zotero 的真实表格 Ctrl+V 和跨设备同步仍待人工验证。清单沿用上游的 Zotero 9 兼容声明，但本版新增功能尚未在 Zotero 9 中验证。
+已通过 `pnpm run verify`：**48 个测试文件、1,226 项测试**，以及类型检查、文档检查、构建和打包。截图粘贴已由用户在 Zotero 10.0.6 中确认可用；预览下方续写、表格粘贴和 Delete 补救有自动化测试，真实 Zotero 中的 Delete、各来源应用到 Zotero 的表格 Ctrl+V 和跨设备同步仍待人工验证。清单沿用上游的 Zotero 9 兼容声明，但本版新增功能尚未在 Zotero 9 中验证。
 
 本修改版的问题请提交到[本仓库 Issues](https://github.com/zdsun01/zotero-annotation-markdown/issues)，附上 Zotero 版本、插件版本和复现步骤。示例表格或批注请使用不含隐私的内容。
 

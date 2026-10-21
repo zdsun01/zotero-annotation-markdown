@@ -51,6 +51,9 @@ interface ReaderLike {
   _waitForReader?(): PromiseLike<void> | null;
   _initPromise?: PromiseLike<void> | null;
   _internalReader?: {
+    _state?: { readOnly?: boolean; contextMenu?: unknown; selectedAnnotationIDs: string[]; annotations: Array<{ id: string; readOnly?: boolean; isExternal?: boolean }> };
+    deleteAnnotations?(ids: string[]): number;
+    _lastView?: { focus?(): void };
     _annotationManager?: AnnotationManagerLike | null;
     _annotationSelectionTriggeredFromView?: boolean;
     _enableAnnotationDeletionFromComment?: boolean;
@@ -230,6 +233,7 @@ export function createPlugin({
               throw new Error("Image loading unavailable");
             } : undefined,
             readerReady: true,
+            deletePreviewAnnotation: id => deleteReaderAnnotationFromPreview(reader, id),
             styleText,
             logger: diagnosticsLogger
           });
@@ -559,6 +563,29 @@ function getReaderDocument(reader: ReaderLike): Document | null {
 /** Uses the same AnnotationManager entry point as Zotero's native editor. */
 export function canUseReaderFastEditor(reader: ReaderLike): boolean {
   return Boolean(getReaderAnnotationManager(reader));
+}
+
+/** Use the same deletion command as Zotero's annotation menu, including undo. */
+export function deleteReaderAnnotationFromPreview(reader: ReaderLike, id: string): boolean {
+  try {
+    const host = reader._internalReader;
+    const state = host?._state;
+    if (!host?.deleteAnnotations || !state || state.readOnly || state.contextMenu ||
+        state.selectedAnnotationIDs.length !== 1 || state.selectedAnnotationIDs[0] !== id) return false;
+    const annotation = state.annotations.find(item => item.id === id);
+    if (!annotation || annotation.readOnly || annotation.isExternal) return false;
+    let ids = [id];
+    const targetWindow = reader._iframeWindow ?? reader.window;
+    const cloneInto = pluginGlobals.Components?.utils?.cloneInto;
+    if (targetWindow && typeof cloneInto === "function") ids = cloneInto(ids, targetWindow) as string[];
+    const deleted = host.deleteAnnotations(ids) > 0;
+    if (deleted) {
+      try { host._lastView?.focus?.(); } catch { /* Deletion already succeeded. */ }
+    }
+    return deleted;
+  } catch {
+    return false;
+  }
 }
 
 /** Uses the same AnnotationManager entry point as Zotero's native editor. */
