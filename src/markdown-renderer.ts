@@ -16,6 +16,7 @@ import { createRawSvgBlockProtector } from "./raw-svg-blocks.js";
 import { installLinkedImagePreviews } from "./linked-image-preview.js";
 import { installSourceFavicons } from "./source-favicon.js";
 import { installAttachmentImagePreviews } from "./clipboard-image.js";
+import { installInlineCommentFormat } from "./inline-comment-format.js";
 import type { MarkdownRenderer } from "./types.js";
 import type { MathOutput } from "./settings.js";
 
@@ -142,6 +143,7 @@ function createDefaultMarkdownEngine(isSvgEnabled: () => boolean, renderSvg: Ret
   markdown.use(markdownItCjkFriendly);
   markdown.use(markdownItMark);
   markdown.use(markdownItMarkColors);
+  installInlineCommentFormat(markdown);
   installLinkedImagePreviews(markdown, deferLinkedImages);
   installSourceFavicons(markdown, deferLinkedImages);
   installAttachmentImagePreviews(markdown);

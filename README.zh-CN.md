@@ -6,7 +6,7 @@
 
 本修改版由 [zdsun01](https://github.com/zdsun01) 维护，基于 **[qrkks](https://github.com/qrkks)** 开发的 **[Zotero Annotation Markdown](https://github.com/qrkks/zotero-annotation-markdown)**。Markdown 渲染、数学公式、快速编辑器等基础能力来自原作者及上游贡献者；本仓库新增剪贴板图片、表格转换和预览下方续写功能。这是独立维护的衍生版本，并非原作者的官方发布。
 
-当前版本：**`0.15.4-clipboard.6`**。开发目标环境：**Windows / Zotero 10.0.6**。
+当前版本：**`0.15.4-clipboard.7`**。开发目标环境：**Windows / Zotero 10.0.6**。
 
 ## 本版新增功能
 
@@ -42,6 +42,12 @@ pnpm run package
 
 ## 使用方法
 
+### 文字格式快捷键
+
+在快速批注编辑框中选中文字：**Ctrl+B 加粗**、**Ctrl+U 下划线**、**Ctrl+Shift+加号 上标**、**Ctrl+Shift+减号 下标**。也支持用 Cmd 代替 Ctrl。再次按相同快捷键可移除选区周围对应的格式。没有选中文字时，插入一对格式标记并将光标放在中间，直接继续输入；多行选区逐行处理。
+
+编辑时显示源码：`**加粗**`、`<u>下划线</u>`、`<sup>上标</sup>`、`<sub>下标</sub>`；按 Esc 保存后显示排版效果。只支持这些成对、无属性的行内标签，任意 HTML 仍不启用。图片和表格下方的「继续输入文字」框也支持快捷键。
+
 ### 粘贴截图与继续输入
 
 1. 复制截图，点击批注评论，在编辑框内按 **Ctrl+V**。
@@ -72,7 +78,7 @@ pnpm run package
 
 ## 验证情况与问题反馈
 
-已通过 `pnpm run verify`：**49 个测试文件、1,253 项测试**，以及类型检查、文档检查、构建和打包。截图粘贴已由用户在 Zotero 10.0.6 中确认可用；预览下方续写、表格粘贴和 Delete 补救有自动化测试，真实 Zotero 中的 Delete、各来源应用到 Zotero 的表格 Ctrl+V 和跨设备同步仍待人工验证。清单沿用上游的 Zotero 9 兼容声明，但本版新增功能尚未在 Zotero 9 中验证。
+已通过 `pnpm run verify`：**50 个测试文件、1,285 项测试**，以及类型检查、文档检查、构建和打包。截图粘贴已由用户在 Zotero 10.0.6 中确认可用；预览下方续写、表格粘贴、文字格式和 Delete 补救有自动化测试，真实 Zotero 中的格式快捷键及撤销、Delete、各来源应用到 Zotero 的表格 Ctrl+V 和跨设备同步仍待人工验证。清单沿用上游的 Zotero 9 兼容声明，但本版新增功能尚未在 Zotero 9 中验证。
 
 本修改版的问题请提交到[本仓库 Issues](https://github.com/zdsun01/zotero-annotation-markdown/issues)，附上 Zotero 版本、插件版本和复现步骤。示例表格或批注请使用不含隐私的内容。
 

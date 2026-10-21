@@ -17,6 +17,8 @@
 
 #### Clipboard screenshots (local build)
 
+Build `0.15.4-clipboard.7` adds fast-editor formatting shortcuts: **Ctrl+B** bold, **Ctrl+U** underline, **Ctrl+Shift+Plus** superscript and **Ctrl+Shift+Minus** subscript. Repeat to remove matching format markers; with no selection, markers are inserted around the caret. Source remains visible while editing; Escape saves and renders it. Superscript, subscript and underline use balanced, attribute-free `<sup>`, `<sub>` and `<u>` tags; arbitrary HTML stays disabled. Supported in sidebar, popup and append fields with the fast comment editor enabled.
+
 Build `0.15.4-clipboard.6` also restores Delete for an untouched empty comment automatically focused after selecting a PDF underline (or another annotation supported by Zotero's native empty-comment shortcut). Eligibility is captured before the fast editor's keyboard guard, then selection, permissions and saved comment are checked again at deletion. Any input, paste or composition disables the shortcut for that editing session; existing comments and append fields are never eligible.
 
 Build `0.15.4-clipboard.5` repairs Delete when a rendered preview leaves focus in the hidden original comment editor. Close the context menu, select the annotation, and press **Delete** to use Zotero's native deletion command with undo. This removes the entire annotation, including its highlight or note, not just its comment. Visible editors, IME composition, read-only annotations and open menus/dialogs do not use this fallback. Screenshot attachments are retained.

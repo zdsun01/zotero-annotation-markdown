@@ -8,6 +8,7 @@ import { isSvgPreviewControl } from "./svg-preview-viewer.js";
 import { handleLinkedImageError } from "./linked-image-preview.js";
 import { installImagePaste } from "./image-paste.js";
 import { installTablePaste } from "./table-paste.js";
+import { installCommentFormatting } from "./comment-formatting.js";
 import { countRenderedImages, imageBadgeLabel, imageCountHint, imageLocale, type ImageCounts } from "./image-counts.js";
 
 const COMMENT_SELECTORS: string[] = [
@@ -860,6 +861,7 @@ function showFastEditor(
     );
   };
   installTablePaste(textarea, editor);
+  installCommentFormatting(textarea);
   if (adapter.importImage) {
     imagePaste = installImagePaste({
       textarea, editor,

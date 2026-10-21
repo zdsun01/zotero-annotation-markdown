@@ -37,7 +37,8 @@ Based on upstream revision d203ea5.
 
 This independently maintained version adds clipboard screenshot imports,
 continued writing below image/table previews, clipboard table conversion,
-and a Delete shortcut fallback for focused hidden annotation comment editors.
+text formatting keyboard shortcuts, and a Delete shortcut fallback for
+focused hidden or untouched empty annotation comment editors.
 The original author and contributors retain attribution for the upstream
 project. This modified version retains AGPL-3.0-or-later and is not an
 official release by the upstream author.

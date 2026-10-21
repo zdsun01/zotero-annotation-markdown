@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.15.4-clipboard.7 - 2026-10-21 (modified build)
+
+- Add Ctrl+B bold, Ctrl+U underline, Ctrl+Shift+Plus superscript and Ctrl+Shift+Minus subscript in fast comment editors, including append fields. Support toggling, empty-caret insertion and multi-line selections, using native insertion for undo when available.
+- Render balanced, attribute-free `u`, `sup` and `sub` inline tags with nested Markdown, while keeping arbitrary HTML disabled and code literal.
+- 新增批注文字格式快捷键，支持加粗、下划线、上标、下标，重复按键取消、无选区插入和多行选区。保存后预览显示对应格式，任意 HTML 仍不启用。
+
 ## 0.15.4-clipboard.6 - 2026-10-21 (modified build)
 
 - Restore Delete when selecting a PDF underline auto-focuses an untouched empty comment. Capture native page-selection eligibility before the fast editor guard, and recheck the saved comment, selection and permissions before calling Zotero's deletion command. Disable whole-annotation deletion after typing, paste or IME activity; preserve existing and append drafts.

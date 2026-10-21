@@ -6,7 +6,7 @@ Paste screenshots and tables directly into Zotero annotation comments, then keep
 
 This modified version is maintained by [zdsun01](https://github.com/zdsun01). It builds on **[Zotero Annotation Markdown](https://github.com/qrkks/zotero-annotation-markdown)** by **[qrkks](https://github.com/qrkks)**. The original author and contributors developed the Markdown renderer, math support, fast editor and other underlying features. This repository adds clipboard images, table conversion and an entry for continuing below previews. It is an independently maintained derivative, not an official upstream release.
 
-Current version: **`0.15.4-clipboard.6`**. Development targets **Zotero 10.0.6 on Windows**.
+Current version: **`0.15.4-clipboard.7`**. Development targets **Zotero 10.0.6 on Windows**.
 
 ## Added in this version
 
@@ -42,6 +42,12 @@ This build uses the same add-on ID as upstream and replaces it when installed. A
 
 ## Usage
 
+### Text formatting shortcuts
+
+In the fast comment editor, select text and use **Ctrl+B** for bold, **Ctrl+U** for underline, **Ctrl+Shift+Plus** for superscript, or **Ctrl+Shift+Minus** for subscript. Cmd also works as the primary modifier. Repeat the shortcut to remove the matching surrounding format. Without a selection, it inserts a marker pair with the caret inside, ready for typing. Multi-line selections are formatted line by line.
+
+The editor shows source: `**bold**`, `<u>underline</u>`, `<sup>superscript</sup>` and `<sub>subscript</sub>`. Press Escape to save and see the formatted preview. Only these balanced, attribute-free inline tags are supported; arbitrary HTML remains disabled. This also works in the Continue writing field below images and tables.
+
 ### Screenshots and continued writing
 
 1. Copy a screenshot, click an annotation comment and press **Ctrl+V**.
@@ -72,7 +78,7 @@ Since `0.15.4-clipboard.6`, selecting an underline on the PDF and receiving auto
 
 ## Validation and feedback
 
-`pnpm run verify` passed **49 test files / 1,253 tests**, TypeScript, documentation checks, build and packaging. Screenshot pasting was confirmed by the user on Zotero 10.0.6. The append, table and Delete fallback workflows have automated coverage; native Delete, table Ctrl+V from each source application and cross-device sync still need manual validation. Zotero 9 remains in the inherited compatibility declaration but has not been verified for these additions.
+`pnpm run verify` passed **50 test files / 1,285 tests**, TypeScript, documentation checks, build and packaging. Screenshot pasting was confirmed by the user on Zotero 10.0.6. The append, table, formatting and Delete fallback workflows have automated coverage; native formatting shortcuts and undo, Delete, table Ctrl+V from each source application and cross-device sync still need manual validation. Zotero 9 remains in the inherited compatibility declaration but has not been verified for these additions.
 
 Report problems with this modified version in [this repository's Issues](https://github.com/zdsun01/zotero-annotation-markdown/issues), including your Zotero version, plugin version and reproduction steps. Please use a non-sensitive example table or annotation.
 
