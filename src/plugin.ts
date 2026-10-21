@@ -51,7 +51,7 @@ interface ReaderLike {
   _waitForReader?(): PromiseLike<void> | null;
   _initPromise?: PromiseLike<void> | null;
   _internalReader?: {
-    _state?: { readOnly?: boolean; contextMenu?: unknown; selectedAnnotationIDs: string[]; annotations: Array<{ id: string; readOnly?: boolean; isExternal?: boolean }> };
+    _state?: { readOnly?: boolean; contextMenu?: unknown; selectedAnnotationIDs: string[]; annotations: Array<{ id: string; readOnly?: boolean; isExternal?: boolean; comment?: string; type?: string }> };
     deleteAnnotations?(ids: string[]): number;
     _lastView?: { focus?(): void };
     _annotationManager?: AnnotationManagerLike | null;
@@ -209,6 +209,7 @@ export function createPlugin({
               commitComment: (annotationID, comment) =>
                 commitReaderAnnotationComment(reader, annotationID, comment),
               importImage: imageStore?.importImage,
+              prepareEmptyAnnotationDeletion: id => prepareReaderEmptyAnnotationDeletion(reader, id),
               beginFastEditorKeyboardGuard: () =>
                 beginReaderFastEditorKeyboardGuard(reader),
               useWeaveroLinkColors: () => useWeaveroLinkColors(Zotero),
@@ -585,6 +586,23 @@ export function deleteReaderAnnotationFromPreview(reader: ReaderLike, id: string
     return deleted;
   } catch {
     return false;
+  }
+}
+
+/** Preserve the native Delete action for an untouched, auto-focused empty comment. */
+export function prepareReaderEmptyAnnotationDeletion(reader: ReaderLike, id: string): (() => boolean) | undefined {
+  try {
+    const host = reader._internalReader;
+    if (!host?._enableAnnotationDeletionFromComment || !host._annotationSelectionTriggeredFromView) return;
+    const isEmptyAnnotation = () => {
+      const annotation = host._state?.annotations.find(item => item.id === id);
+      return annotation && !annotation.comment &&
+        ["underline", "highlight", "note", "image"].includes(annotation.type ?? "");
+    };
+    if (!isEmptyAnnotation()) return;
+    return () => Boolean(isEmptyAnnotation() && deleteReaderAnnotationFromPreview(reader, id));
+  } catch {
+    return;
   }
 }
 

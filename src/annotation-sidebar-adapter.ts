@@ -66,6 +66,7 @@ interface CreateAnnotationSidebarAdapterOptions {
   isFastEditorEnabled?(): boolean;
   commitComment?(annotationID: string, comment: string): boolean;
   importImage?(file: Blob, annotationID: string): Promise<string>;
+  prepareEmptyAnnotationDeletion?(annotationID: string): (() => boolean) | undefined;
   beginFastEditorKeyboardGuard?(): (() => void) | void;
   useWeaveroLinkColors?(): boolean;
   getLocale?(): string | undefined;
@@ -74,6 +75,7 @@ interface CreateAnnotationSidebarAdapterOptions {
 /** Operations the controller may perform without knowing Zotero's DOM shape. */
 export interface AnnotationSidebarAdapter {
   importImage?: (file: Blob, annotationID: string) => Promise<string>;
+  prepareEmptyAnnotationDeletion?: (annotationID: string) => (() => boolean) | undefined;
   findCommentNodes(root?: Node | null): HTMLElement[];
   findRenderedCommentNodes(root?: Node | null): HTMLElement[];
   countNativeNoteEditorComments(root?: Node | null): number;
@@ -130,6 +132,7 @@ export function createAnnotationSidebarAdapter({
   isFastEditorEnabled = () => false,
   commitComment,
   importImage,
+  prepareEmptyAnnotationDeletion,
   beginFastEditorKeyboardGuard,
   useWeaveroLinkColors = () => false,
   getLocale
@@ -140,6 +143,7 @@ export function createAnnotationSidebarAdapter({
 
   return {
     importImage,
+    prepareEmptyAnnotationDeletion,
     findCommentNodes(root: Node | null = documentRef) {
       const queryRoot = getQueryRoot(root);
       if (!queryRoot) {
@@ -786,6 +790,10 @@ function showFastEditor(
     return;
   }
   const originalSource = adapter.getSourceText(node);
+  // Snapshot native page-selection eligibility before the editor guard disables
+  // Zotero's deletion shortcut for text editing. Never arm append editors.
+  const deleteEmptyAnnotation = originalSource === "" && !appendOnly
+    ? adapter.prepareEmptyAnnotationDeletion?.(annotationID) : undefined;
   const viewportAnchor = captureFastEditorViewportAnchor(node);
 
   const documentRef = node.ownerDocument;
@@ -915,7 +923,12 @@ function showFastEditor(
   editor.addEventListener("keypress", stopHostEventPropagation);
   editor.addEventListener("beforeinput", stopHostEventPropagation);
   let previousValueLength = textarea.value.length;
+  let hasUserInput = false;
+  for (const type of ["beforeinput", "paste", "compositionstart"]) {
+    textarea.addEventListener(type, () => { hasUserInput = true; }, true);
+  }
   textarea.addEventListener("input", (event) => {
+    hasUserInput = true;
     const pasted = isPasteInputEvent(event);
     const viewportAnchor = pasted
       ? captureFastEditorViewportAnchor(textarea)
@@ -947,6 +960,19 @@ function showFastEditor(
     commitAndClose();
   });
   textarea.addEventListener("keydown", (event) => {
+    if (event.key === "Delete" && deleteEmptyAnnotation && !hasUserInput &&
+        textarea.value === "" && !textarea.readOnly && !imagePaste?.isPending() &&
+        !event.defaultPrevented && !event.repeat && !event.isComposing && event.keyCode !== 229 &&
+        !event.ctrlKey && !event.metaKey && !event.altKey && !event.shiftKey &&
+        documentRef.activeElement === textarea && editor.isConnected &&
+        !documentRef.querySelector(".context-menu-overlay,[role='dialog']:not([hidden]),.label-popup")) {
+      if (deleteEmptyAnnotation()) {
+        event.preventDefault();
+        event.stopPropagation();
+        commitAndClose();
+      }
+      return;
+    }
     if (event.key === "Escape" && !event.isComposing && event.keyCode !== 229) {
       event.preventDefault();
       event.stopPropagation();

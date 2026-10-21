@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.15.4-clipboard.6 - 2026-10-21 (modified build)
+
+- Restore Delete when selecting a PDF underline auto-focuses an untouched empty comment. Capture native page-selection eligibility before the fast editor guard, and recheck the saved comment, selection and permissions before calling Zotero's deletion command. Disable whole-annotation deletion after typing, paste or IME activity; preserve existing and append drafts.
+- 修复点击 PDF 下划线后，自动聚焦的空评论框挡住 Delete 的实际场景。未输入或粘贴时可删除下划线批注；输入过内容、已有评论及续写框仍按文字编辑处理，删除走 Zotero 原生命令并可撤销。
+
 ## 0.15.4-clipboard.5 - 2026-10-21 (modified build)
 
 - Restore Delete for a selected rendered annotation when keyboard focus remains in the hidden native comment editor. Use Zotero's native deletion command and undo, scoped to the matching single selected annotation. Keep text editing, IME, menus, read-only/external annotations and ordinary native deletion unchanged.

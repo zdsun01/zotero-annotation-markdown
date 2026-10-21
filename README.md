@@ -6,7 +6,7 @@ Paste screenshots and tables directly into Zotero annotation comments, then keep
 
 This modified version is maintained by [zdsun01](https://github.com/zdsun01). It builds on **[Zotero Annotation Markdown](https://github.com/qrkks/zotero-annotation-markdown)** by **[qrkks](https://github.com/qrkks)**. The original author and contributors developed the Markdown renderer, math support, fast editor and other underlying features. This repository adds clipboard images, table conversion and an entry for continuing below previews. It is an independently maintained derivative, not an official upstream release.
 
-Current version: **`0.15.4-clipboard.5`**. Development targets **Zotero 10.0.6 on Windows**.
+Current version: **`0.15.4-clipboard.6`**. Development targets **Zotero 10.0.6 on Windows**.
 
 ## Added in this version
 
@@ -68,9 +68,11 @@ The full editor uses Markdown source. This version is not a complete WYSIWYG edi
 
 Select the annotation and press **Delete** while viewing its preview, with the context menu closed. This deletes the entire annotation, matching the menu's Delete command; it does not merely clear the comment or remove one image. While a visible text editor is active, Delete edits text. Deletion uses Zotero's command and undo history. Screenshot attachments remain in the library.
 
+Since `0.15.4-clipboard.6`, selecting an underline on the PDF and receiving automatic focus in its empty comment field also preserves Zotero's Delete action: before any typing or pasting, **Delete removes the underline annotation**. Existing comments, append fields, and fields where input has already started keep text-editing behavior, even if you clear the draft again.
+
 ## Validation and feedback
 
-`pnpm run verify` passed **48 test files / 1,226 tests**, TypeScript, documentation checks, build and packaging. Screenshot pasting was confirmed by the user on Zotero 10.0.6. The append, table and Delete fallback workflows have automated coverage; native Delete, table Ctrl+V from each source application and cross-device sync still need manual validation. Zotero 9 remains in the inherited compatibility declaration but has not been verified for these additions.
+`pnpm run verify` passed **49 test files / 1,253 tests**, TypeScript, documentation checks, build and packaging. Screenshot pasting was confirmed by the user on Zotero 10.0.6. The append, table and Delete fallback workflows have automated coverage; native Delete, table Ctrl+V from each source application and cross-device sync still need manual validation. Zotero 9 remains in the inherited compatibility declaration but has not been verified for these additions.
 
 Report problems with this modified version in [this repository's Issues](https://github.com/zdsun01/zotero-annotation-markdown/issues), including your Zotero version, plugin version and reproduction steps. Please use a non-sensitive example table or annotation.
 

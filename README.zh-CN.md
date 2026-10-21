@@ -6,7 +6,7 @@
 
 本修改版由 [zdsun01](https://github.com/zdsun01) 维护，基于 **[qrkks](https://github.com/qrkks)** 开发的 **[Zotero Annotation Markdown](https://github.com/qrkks/zotero-annotation-markdown)**。Markdown 渲染、数学公式、快速编辑器等基础能力来自原作者及上游贡献者；本仓库新增剪贴板图片、表格转换和预览下方续写功能。这是独立维护的衍生版本，并非原作者的官方发布。
 
-当前版本：**`0.15.4-clipboard.5`**。开发目标环境：**Windows / Zotero 10.0.6**。
+当前版本：**`0.15.4-clipboard.6`**。开发目标环境：**Windows / Zotero 10.0.6**。
 
 ## 本版新增功能
 
@@ -68,9 +68,11 @@ pnpm run package
 
 关闭右键菜单，选中批注并处于预览状态时，按 **Delete**，效果与菜单中的「删除」一致：删除整条批注，包括对应的高亮或便笺，而不只是清空评论或删除单张图片。正在可见输入框中编辑文字时，Delete 仍只删除文字。删除走 Zotero 原有命令，可通过 Zotero 撤销；截图附件仍保留在文献库中。
 
+从 `0.15.4-clipboard.6` 起，也支持图中这种情况：**点击 PDF 下划线后，空评论框自动聚焦，在尚未输入或粘贴内容时按 Delete，删除该下划线批注**。已有评论、续写框，以及已经开始输入过的评论框仍保持文字编辑行为；输入后再清空也不会因此删除下划线。
+
 ## 验证情况与问题反馈
 
-已通过 `pnpm run verify`：**48 个测试文件、1,226 项测试**，以及类型检查、文档检查、构建和打包。截图粘贴已由用户在 Zotero 10.0.6 中确认可用；预览下方续写、表格粘贴和 Delete 补救有自动化测试，真实 Zotero 中的 Delete、各来源应用到 Zotero 的表格 Ctrl+V 和跨设备同步仍待人工验证。清单沿用上游的 Zotero 9 兼容声明，但本版新增功能尚未在 Zotero 9 中验证。
+已通过 `pnpm run verify`：**49 个测试文件、1,253 项测试**，以及类型检查、文档检查、构建和打包。截图粘贴已由用户在 Zotero 10.0.6 中确认可用；预览下方续写、表格粘贴和 Delete 补救有自动化测试，真实 Zotero 中的 Delete、各来源应用到 Zotero 的表格 Ctrl+V 和跨设备同步仍待人工验证。清单沿用上游的 Zotero 9 兼容声明，但本版新增功能尚未在 Zotero 9 中验证。
 
 本修改版的问题请提交到[本仓库 Issues](https://github.com/zdsun01/zotero-annotation-markdown/issues)，附上 Zotero 版本、插件版本和复现步骤。示例表格或批注请使用不含隐私的内容。
 

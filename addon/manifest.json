@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Zotero Annotation Markdown + Clipboard Images (Local)",
-  "version": "0.15.4-clipboard.5",
+  "version": "0.15.4-clipboard.6",
   "description": "Local build: paste screenshots into annotation comments with Ctrl+V.",
   "author": "qrkks <qrkks3@gmail.com>",
   "icons": {
